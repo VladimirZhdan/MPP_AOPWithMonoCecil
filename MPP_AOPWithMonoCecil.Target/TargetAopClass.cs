@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MPP_AOPWithMonoCecil
+namespace MPP_AOPWithMonoCecil.Target
 {
-    class Program
+    [Log]
+    class TargetAopClass
     {
-        static void Main(string[] args)
-        {
 
-        }
     }
 }
