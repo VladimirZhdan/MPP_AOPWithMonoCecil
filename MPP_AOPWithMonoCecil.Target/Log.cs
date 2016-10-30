@@ -18,6 +18,7 @@ namespace MPP_AOPWithMonoCecil.Target
                 writer.Write("CLASS : {" + method.DeclaringType + "}. ");
                 writer.Write("METHOD: {" + method.Name + "}. ");
                 writer.Write("PARAMETERS: {");
+                /*
                 if(parameters.Count > 0)
                 {
                     foreach (KeyValuePair<string, object> keyValue in parameters)
@@ -34,6 +35,7 @@ namespace MPP_AOPWithMonoCecil.Target
                 {
                     writer.Write("and RETURNS {" + result + "}");
                 }
+                */
                 writer.WriteLine();
             } 
         }

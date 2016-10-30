@@ -10,7 +10,16 @@ namespace MPP_AOPWithMonoCecil
     {
         static void Main(string[] args)
         {
-
+            string fileName = @"e:\Ждан Вова\БГУИР\3 курс\5 семестр\СПП\Лабораторные работы\4-я лаб раб\AOP with Mono.Cecil\MPP_AOPWithMonoCecil\MPP_AOPWithMonoCecil.Target\bin\Debug\MPP_AOPWithMonoCecil.Target.exe";
+            if (args.Length != 0)
+            {
+                return;
+            }
+            else
+            {
+                Injector injector = new Injector(fileName);
+                injector.Inject();
+            }
         }
     }
 }
