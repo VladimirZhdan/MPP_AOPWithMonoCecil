@@ -22,11 +22,7 @@ namespace MPP_AOPWithMonoCecil.Target
         }
 
         public int Second(int parameter1, object parameter2)
-        {
-            Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add("Name", parameter1 );
-
-
+        {            
             return 10;
         }
     }
