@@ -48,27 +48,30 @@ namespace MPP_AOPWithMonoCecil
 
         private void InjectMethod(MethodDefinition method, AssemblyDefinition assembly, TypeDefinition logTypeDefenition, TypeReference methodBaseType)
         {
+            bool methodIsVoid = method.ReturnType.Name == "Void" ? true : false;            
             MethodInfo writeLineMethod = typeof(Console).GetMethod("WriteLine", new Type[] { typeof(string) });
             MethodReference writeLineRef = assembly.MainModule.Import(writeLineMethod);
             var methodILProcessor = method.Body.GetILProcessor();
 
-
+            //create Types reference
             var attributeRef = assembly.MainModule.Import(typeof(CustomAttribute));
             var typeRef = assembly.MainModule.Import(typeof(Type));
-
+            var dictionaryStringObjectRef = assembly.MainModule.Import(typeof(Dictionary<string, object>));
+            var objectRef = assembly.MainModule.Import(typeof(object));
 
             //declayring local variables            
             var currentMethodBaseVar = new VariableDefinition(methodBaseType);
             var currentDeclayringTypeVar = new VariableDefinition(typeRef);
-
             var logAttributeVar = new VariableDefinition(attributeRef);
-
+            var parametersVar = new VariableDefinition(dictionaryStringObjectRef);
+            var resultVar = new VariableDefinition(objectRef);
 
             //create local variables
             methodILProcessor.Body.Variables.Add(currentMethodBaseVar);
             methodILProcessor.Body.Variables.Add(logAttributeVar);
             methodILProcessor.Body.Variables.Add(currentDeclayringTypeVar);
-
+            methodILProcessor.Body.Variables.Add(parametersVar);
+            methodILProcessor.Body.Variables.Add(resultVar);
 
             //create methods reference
             MethodReference getCurrentMethodBaseRef = assembly.MainModule.Import(typeof(System.Reflection.MethodBase).GetMethod("GetCurrentMethod"));
@@ -77,37 +80,52 @@ namespace MPP_AOPWithMonoCecil
                 new Type[] { typeof(RuntimeTypeHandle) }));
             MethodReference getCustomAttributeRef = assembly.MainModule.Import(typeof(Attribute).GetMethod("GetCustomAttribute",
                 new Type[] { typeof(System.Reflection.MemberInfo), typeof(Type) }));
-
+            MethodReference dictionaryConstructorRef = assembly.MainModule.Import(typeof(Dictionary<string, object>).GetConstructor(Type.EmptyTypes));
+            MethodReference dictionaryMethodAddRef = assembly.MainModule.Import(typeof(Dictionary<string, object>).GetMethod("Add"));
 
             List<Instruction> insertInstuctionList = new List<Instruction>();
+
+            //get result from stack
+            if (!methodIsVoid)
+            {
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, resultVar));                
+            }            
 
             //set variables
             insertInstuctionList.Add(Instruction.Create(OpCodes.Call, getCurrentMethodBaseRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, currentMethodBaseVar));
-
+            //currentMethodBaseVar = System.Reflection.MethodBase.GetCurrentMethod();
 
             insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, currentMethodBaseVar));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Callvirt, getDeclayringTypeRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, currentDeclayringTypeVar));
-            //
+            //currentDeclayringTypeVar = currentMethodBaseVar.DeclaringType;
             insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, currentDeclayringTypeVar));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Ldtoken, logTypeDefenition));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Call, getTypeFromHandleRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Call, getCustomAttributeRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Castclass, logTypeDefenition));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, logAttributeVar));
-
-
-
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Ldstr, "Inject"));
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Call, writeLineRef));
-
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Ldstr, method.DeclaringType.ToString()));
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Call, writeLineRef));
-
-
+            //logAttributeVar = (Log)currentDeclayringTypeVar.GetCustomAttributes(logTypeDefenition.GetType());
+            
+            insertInstuctionList.Add(Instruction.Create(OpCodes.Newobj, dictionaryConstructorRef));
+            insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, parametersVar));
+            
+            //parametersVar = new Dictionary<string, object>();
+            foreach (var arg in method.Parameters)
+            {
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, parametersVar));
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Ldstr, arg.Name));
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Ldarg, arg));
+                if(arg.ParameterType.IsPrimitive)
+                {
+                    TypeReference typeToBox = assembly.MainModule.Import(arg.ParameterType);
+                    insertInstuctionList.Add(Instruction.Create(OpCodes.Box, typeToBox));
+                }
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Call, dictionaryMethodAddRef));
+            }
+                                  
             MethodDefinition onLoggerTargetMethodExecute = GetOnLoggerTargetMethodExecuteDef(logTypeDefenition);
-
 
             insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, logAttributeVar));
             //this paramether = log
@@ -115,20 +133,46 @@ namespace MPP_AOPWithMonoCecil
             insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, currentMethodBaseVar));
             //method = currentMethodBaseVar
 
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Ldnull));
-            //parameters = null
+            insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, parametersVar));
+            //parameters = parametersVar;
 
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Ldnull));
+            //insertInstuctionList.Add(Instruction.Create(OpCodes.Ldnull));
             //result = null
 
+            
+            if(methodIsVoid)
+            {
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Ldnull));
+            }
+            else
+            {
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, resultVar));
+                if (method.ReturnType.IsPrimitive)
+                {
+                    TypeReference typeToBox = assembly.MainModule.Import(method.ReturnType);
+                    insertInstuctionList.Add(Instruction.Create(OpCodes.Box, typeToBox));
+                }                
+            }
+            //if (methodIsVoid)
+            //    result = null;
+            //else            
+            //    result = Ldloc_0;
+                
             insertInstuctionList.Add(Instruction.Create(OpCodes.Callvirt, onLoggerTargetMethodExecute));
             //OnLoggerTargetMethodExecute(method, parameters, result);
+
+            //put result on stack
+            if (!methodIsVoid)
+            {
+                insertInstuctionList.Add(Instruction.Create(OpCodes.Ldloc, resultVar));
+            }
+
 
             InsertInjectInstructionsIntoMethod(methodILProcessor, insertInstuctionList.ToArray());
         }
 
         private void InsertInjectInstructionsIntoMethod(ILProcessor methodILProcessor, Instruction[] instruction)
-        {
+        {            
             for(int i = 0; i < instruction.Length; i++)
             {
                 methodILProcessor.Body.Instructions.Insert(methodILProcessor.Body.Instructions.Count - 1, instruction[i]);

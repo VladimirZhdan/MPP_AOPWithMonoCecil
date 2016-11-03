@@ -15,15 +15,22 @@ namespace MPP_AOPWithMonoCecil.Target
         {
             using(StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Append, FileAccess.Write)))
             {
-                writer.Write("CLASS : {" + method.DeclaringType + "}. ");
+                writer.Write("CLASS : {" + method.DeclaringType.Name + "}. ");
                 writer.Write("METHOD: {" + method.Name + "}. ");
                 writer.Write("PARAMETERS: {");
-                /*
+
+                
                 if(parameters.Count > 0)
                 {
+                    int counter = 0;                    
                     foreach (KeyValuePair<string, object> keyValue in parameters)
                     {
                         writer.Write(keyValue.Key + " = " + keyValue.Value);
+                        if (counter != (parameters.Count - 1))
+                        {
+                            writer.Write(", ");
+                        }
+                        counter++;
                     }
                 }
                 else
@@ -31,11 +38,14 @@ namespace MPP_AOPWithMonoCecil.Target
                     writer.Write("none");
                 }
                 writer.Write("} ");
+                
+                
                 if (result != null)
-                {
+                {                    
                     writer.Write("and RETURNS {" + result + "}");
-                }
-                */
+                } 
+                
+                                               
                 writer.WriteLine();
             } 
         }
