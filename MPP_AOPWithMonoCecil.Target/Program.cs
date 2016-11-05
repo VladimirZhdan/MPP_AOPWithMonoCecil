@@ -10,9 +10,9 @@ namespace MPP_AOPWithMonoCecil.Target
     {                           
         static void Main(string[] args)
         {
-            //var target = new TargetAopClass(25);
-            //target.First();
-            //target.Second(5, 20);
+            var target = new TargetAopClass(25);
+            target.First();
+            target.Second(5, 20);
             
 
             ListenerObject listener = new ListenerObject();

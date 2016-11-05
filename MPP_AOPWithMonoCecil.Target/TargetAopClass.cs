@@ -9,7 +9,7 @@ namespace MPP_AOPWithMonoCecil.Target
     [Log]
     public class TargetAopClass
     {
-        private int parameter;
+        private int parameter;        
 
         public TargetAopClass(int parameter)
         {

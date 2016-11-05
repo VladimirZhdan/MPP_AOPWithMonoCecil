@@ -15,8 +15,8 @@ namespace MPP_AOPWithMonoCecil
             {
                 fileName = args[0];
             }            
-            //    Injector injector = new Injector(fileName);
-            //    injector.Inject();
+            Injector injector = new Injector(fileName);
+            injector.Inject();
 
             WeakInjector weakInjector = new WeakInjector(fileName);
             weakInjector.Inject();        

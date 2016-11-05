@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 using MPP_AOPWithMonoCecil.Target;
-using System.Collections.Generic;
 
 namespace MPP_AOPWithMonoCecil.Tests
 {
