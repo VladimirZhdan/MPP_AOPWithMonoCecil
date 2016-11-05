@@ -50,8 +50,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="InjectorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WeakInjectorTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MPP_AOPWithMonoCecil.Target\MPP_AOPWithMonoCecil.Target.csproj">
+      <Project>{35e3503a-e427-4459-b874-db7983de5978}</Project>
+      <Name>MPP_AOPWithMonoCecil.Target</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

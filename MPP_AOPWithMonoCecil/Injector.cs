@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Reflection;
@@ -34,7 +32,8 @@ namespace MPP_AOPWithMonoCecil
                 TypeDefinition typeDef = typesEnumerator.Current;
                 InjectType(typeDef, assembly, logTypeDefenition, methodBaseType);
             }                    
-            assembly.Write(assemblyPath);          
+            assembly.Write(assemblyPath);
+            typesEnumerator.Dispose();        
         }
 
         private void InjectType(TypeDefinition type, AssemblyDefinition assembly, TypeDefinition logTypeDefenition, TypeReference methodBaseType)
@@ -213,6 +212,5 @@ namespace MPP_AOPWithMonoCecil
             }
             return null;
         }
-
     }
 }

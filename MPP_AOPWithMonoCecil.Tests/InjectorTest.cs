@@ -4,11 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MPP_AOPWithMonoCecil.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class InjectorTest
     {
         [TestMethod]
         public void TestMethod1()
         {
+
         }
     }
 }
