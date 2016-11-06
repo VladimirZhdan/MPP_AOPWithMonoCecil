@@ -5,7 +5,6 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Reflection;
 
-
 namespace MPP_AOPWithMonoCecil
 {
     public class Injector
@@ -104,9 +103,9 @@ namespace MPP_AOPWithMonoCecil
             insertInstuctionList.Add(Instruction.Create(OpCodes.Call, getTypeFromHandleRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Call, getCustomAttributeRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Castclass, logTypeDefenition));
-            insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, logAttributeVar));
-            //logAttributeVar = (Log)currentDeclayringTypeVar.GetCustomAttributes(logTypeDefenition.GetType());
-            
+            insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, logAttributeVar));            
+            //logAttributeVar =  Attribute.GetCustomAttribute(currentDeclaryringTypeVar, typeof(Log)) as Log
+
             insertInstuctionList.Add(Instruction.Create(OpCodes.Newobj, dictionaryConstructorRef));
             insertInstuctionList.Add(Instruction.Create(OpCodes.Stloc, parametersVar));
             

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MPP_AOPWithMonoCecil.Target
 {
@@ -15,10 +12,9 @@ namespace MPP_AOPWithMonoCecil.Target
         {
             using(StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Append, FileAccess.Write)))
             {
-                writer.Write("CLASS : {" + method.DeclaringType.Name + "}. ");
+                writer.Write("CLASS: {" + method.DeclaringType.Name + "}. ");
                 writer.Write("METHOD: {" + method.Name + "}. ");
                 writer.Write("PARAMETERS: {");
-
                 
                 if(parameters.Count > 0)
                 {
@@ -43,8 +39,7 @@ namespace MPP_AOPWithMonoCecil.Target
                 if (result != null)
                 {                    
                     writer.Write("and RETURNS {" + result + "}");
-                } 
-                
+                }                 
                                                
                 writer.WriteLine();
             } 
